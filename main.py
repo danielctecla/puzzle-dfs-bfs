@@ -17,16 +17,6 @@ class Game:
         self.start_game = False
         self.start_timer = False
         self.elapsed_time = 0
-        self.high_score = float(self.get_high_scores()[0])
-
-    def get_high_scores(self):
-        with open("high_score.txt", "r") as file:
-            scores = file.read().splitlines()
-        return scores
-
-    def save_score(self):
-        with open("high_score.txt", "w") as file:
-            file.write(str("%.3f\n" % self.high_score))
 
     def create_game(self):
         grid = [[x + y * GAME_SIZE for x in range(1, GAME_SIZE + 1)] for y in range(GAME_SIZE)]
@@ -92,8 +82,15 @@ class Game:
         self.start_timer = False
         self.start_game = False
         self.buttons_list = []
-        self.buttons_list.append(Button(500, 100, 200, 50, "Shuffle", WHITE, BLACK))
-        self.buttons_list.append(Button(500, 170, 200, 50, "Reset", WHITE, BLACK))
+
+        self.selected_option = 0
+        self.total_moves = 0
+        self.buttons_list.append(Button(850, 100, 200, 50, 'Shuffle', WHITE, BLACK))
+        self.buttons_list.append(Button(850, 175, 200, 50, 'DFS', WHITE, BLACK))
+        self.buttons_list.append(Button(850, 250, 200, 50, 'BFS', WHITE, BLACK))
+        self.buttons_list.append(Button(850, 325, 200, 50, 'Solve', WHITE, BLACK))
+        self.buttons_list.append(Button(850, 450, 200, 50, 'Test Case', WHITE, BLACK))
+        self.buttons_list.append(Button(850, 525, 200, 50, 'Reset', WHITE, BLACK))
         self.draw_tiles()
 
     def run(self):
@@ -106,18 +103,19 @@ class Game:
 
     def update(self):
         if self.start_game:
-            if self.tiles_grid == self.tiles_grid_completed:
-                self.start_game = False
-                if self.high_score > 0:
-                    self.high_score = self.elapsed_time if self.elapsed_time < self.high_score else self.high_score
-                else:
-                    self.high_score = self.elapsed_time
-                self.save_score()
+            pass
+            # if self.tiles_grid == self.tiles_grid_completed:
+            #     self.start_game = False
+            #     if self.high_score > 0:
+            #         self.high_score = self.elapsed_time if self.elapsed_time < self.high_score else self.high_score
+            #     else:
+            #         self.high_score = self.elapsed_time
+            #     self.save_score()
 
-            if self.start_timer:
-                self.timer = time.time()
-                self.start_timer = False
-            self.elapsed_time = time.time() - self.timer
+            # if self.start_timer:
+            #     self.timer = time.time()
+            #     self.start_timer = False
+            # self.elapsed_time = time.time() - self.timer
 
         if self.start_shuffle:
             self.shuffle()
@@ -125,8 +123,8 @@ class Game:
             self.shuffle_time += 1
             if self.shuffle_time > 120:
                 self.start_shuffle = False
-                self.start_game = True
-                self.start_timer = True
+                # self.start_game = True
+                # self.start_timer = True
 
         self.all_sprites.update()
 
@@ -142,8 +140,21 @@ class Game:
         self.draw_grid()
         for button in self.buttons_list:
             button.draw(self.screen)
-        UIElement(550, 35, "%.3f" % self.elapsed_time).draw(self.screen)
-        UIElement(430, 300, "High Score - %.3f" % (self.high_score if self.high_score > 0 else 0)).draw(self.screen)
+        
+        UIElement(550, 25, "Selected Mode:").draw(self.screen)
+        if self.selected_option == 0:
+            UIElement(550, 75, "None").draw(self.screen)
+        elif self.selected_option == 1:
+            UIElement(550, 75, "DFS").draw(self.screen)
+        elif self.selected_option == 2:
+            UIElement(550, 75, "BFS").draw(self.screen)
+        
+        UIElement(550, 150, "Total Moves:").draw(self.screen)
+        UIElement(550, 200, str(self.total_moves)).draw(self.screen)
+
+        UIElement(550, 500, "Time:").draw(self.screen)
+        UIElement(550, 555, "%.3f" % self.elapsed_time).draw(self.screen)
+        # UIElement(430, 300, "High Score - %.3f" % (self.high_score if self.high_score > 0 else 0)).draw(self.screen)
         pygame.display.flip()
 
     def events(self):
@@ -176,6 +187,10 @@ class Game:
                         if button.text == "Shuffle":
                             self.shuffle_time = 0
                             self.start_shuffle = True
+                        if button.text == "DFS":
+                            self.selected_option = 1
+                        if button.text == "BFS":
+                            self.selected_option = 2
                         if button.text == "Reset":
                             self.new()
 
