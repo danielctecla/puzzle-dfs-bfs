@@ -8,7 +8,9 @@ BGCOLOUR = DARKGREY
 # game settings
 WIDTH = 1100
 HEIGHT = 641
-FPS = 60
+FPS = 120
 title = "Sliding Puzzle Game"
 TILESIZE = 128
 GAME_SIZE = 4
+
+IMAGE_PATH = "images/Paisaje.jpg"

@@ -17,11 +17,21 @@ class Game:
         self.start_game = False
         self.start_timer = False
         self.elapsed_time = 0
+        self.image = self.load_image()   
 
     def create_game(self):
         grid = [[x + y * GAME_SIZE for x in range(1, GAME_SIZE + 1)] for y in range(GAME_SIZE)]
         grid[-1][-1] = 0
         return grid
+    
+    def load_image(self):
+        image = pygame.image.load(IMAGE_PATH)
+        image = pygame.transform.scale(image, (TILESIZE * GAME_SIZE, TILESIZE * GAME_SIZE))
+        return image
+
+    def create_imagematrix(self):
+        matrix = [[(row, col) for col in range(GAME_SIZE)] for row in range(GAME_SIZE)]
+        return matrix
 
     def shuffle(self):
         possible_moves = []
@@ -54,30 +64,41 @@ class Game:
         if choice == "right":
             self.tiles_grid[row][col], self.tiles_grid[row][col + 1] = self.tiles_grid[row][col + 1], \
                                                                        self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row][col + 1] = self.tiles_img_coords[row][col + 1], \
+                                                                                      self.tiles_img_coords[row][col]
         elif choice == "left":
             self.tiles_grid[row][col], self.tiles_grid[row][col - 1] = self.tiles_grid[row][col - 1], \
                                                                        self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row][col - 1] = self.tiles_img_coords[row][col - 1], \
+                                                                                        self.tiles_img_coords[row][col] 
         elif choice == "up":
             self.tiles_grid[row][col], self.tiles_grid[row - 1][col] = self.tiles_grid[row - 1][col], \
                                                                        self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row - 1][col] = self.tiles_img_coords[row - 1][col], \
+                                                                                      self.tiles_img_coords[row][col]
         elif choice == "down":
             self.tiles_grid[row][col], self.tiles_grid[row + 1][col] = self.tiles_grid[row + 1][col], \
                                                                        self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row + 1][col] = self.tiles_img_coords[row + 1][col], \
+                                                                                      self.tiles_img_coords[row][col]
 
     def draw_tiles(self):
         self.tiles = []
         for row, x in enumerate(self.tiles_grid):
             self.tiles.append([])
             for col, tile in enumerate(x):
+                row_ , col_ = self.tiles_img_coords[row][col]
                 if tile != 0:
-                    self.tiles[row].append(Tile(self, col, row, str(tile)))
+                    subimage = self.image.subsurface((col_ * TILESIZE, row_ * TILESIZE, TILESIZE, TILESIZE))
+                    self.tiles[row].append(Tile(self, col, row, subimage, (row_, col_)))
                 else:
-                    self.tiles[row].append(Tile(self, col, row, "empty"))
+                    self.tiles[row].append(Tile(self, col, row, "empty", (row_, col_)))
 
     def new(self):
         self.all_sprites = pygame.sprite.Group()
         self.tiles_grid = self.create_game()
         self.tiles_grid_completed = self.create_game()
+        self.tiles_img_coords = self.create_imagematrix()
         self.elapsed_time = 0
         self.start_timer = False
         self.start_game = False

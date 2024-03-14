@@ -5,24 +5,30 @@ pygame.font.init()
 
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, text):
+    def __init__(self, game, x, y, sub_image, coords):
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pygame.Surface((TILESIZE, TILESIZE))
-        self.x, self.y = x, y
-        self.text = text
-        self.rect = self.image.get_rect()
-        if self.text != "empty":
-            self.font = pygame.font.SysFont("Consolas", 50)
-            font_surface = self.font.render(self.text, True, BLACK)
-            self.image.fill(WHITE)
-            self.font_size = self.font.size(self.text)
-            draw_x = (TILESIZE / 2) - self.font_size[0] / 2
-            draw_y = (TILESIZE / 2) - self.font_size[1] / 2
-            self.image.blit(font_surface, (draw_x, draw_y))
+        self.coords = coords
+        if sub_image != "empty":
+            self.image = sub_image
+            self.text = coords
         else:
+            self.image = pygame.Surface((TILESIZE, TILESIZE))
             self.image.fill(BGCOLOUR)
+            self.text = "empty"
+        self.x, self.y = x, y
+        self.rect = self.image.get_rect()
+        # if self.text != "empty":
+        #     self.font = pygame.font.SysFont("Consolas", 50)
+        #     font_surface = self.font.render(self.text, True, BLACK)
+        #     self.image.fill(WHITE)
+        #     self.font_size = self.font.size(self.text)
+        #     draw_x = (TILESIZE / 2) - self.font_size[0] / 2
+        #     draw_y = (TILESIZE / 2) - self.font_size[1] / 2
+        #     self.image.blit(font_surface, (draw_x, draw_y))
+        # else:
+        #     self.image.fill(BGCOLOUR)
 
     def update(self):
         self.rect.x = self.x * TILESIZE
