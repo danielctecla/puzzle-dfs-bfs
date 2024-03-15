@@ -14,3 +14,6 @@ TILESIZE = 128
 GAME_SIZE = 4
 
 IMAGE_PATH = "images/Paisaje.jpg"
+
+DROW = [-1, 0, 1, 0]
+DCOL = [0, 1, 0, -1]
