@@ -35,54 +35,59 @@ class Game:
         matrix = [[(row, col) for col in range(GAME_SIZE)] for row in range(GAME_SIZE)]
         return matrix
 
+    def move(self, row, col, move):
+        if move == "u":
+            self.tiles_grid[row][col], self.tiles_grid[row - 1][col] = self.tiles_grid[row - 1][col], self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row - 1][col] = self.tiles_img_coords[row - 1][col], self.tiles_img_coords[row][col]
+        elif move == "d":
+            self.tiles_grid[row][col], self.tiles_grid[row + 1][col] = self.tiles_grid[row + 1][col], self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row + 1][col] = self.tiles_img_coords[row + 1][col], self.tiles_img_coords[row][col]
+        elif move == "l":
+            self.tiles_grid[row][col], self.tiles_grid[row][col - 1] = self.tiles_grid[row][col - 1], self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row][col - 1] = self.tiles_img_coords[row][col - 1], self.tiles_img_coords[row][col]
+        elif move == "r":
+            self.tiles_grid[row][col], self.tiles_grid[row][col + 1] = self.tiles_grid[row][col + 1], self.tiles_grid[row][col]
+            self.tiles_img_coords[row][col], self.tiles_img_coords[row][col + 1] = self.tiles_img_coords[row][col + 1], self.tiles_img_coords[row][col]
+
     def shuffle(self):
         possible_moves = []
         for row, tiles in enumerate(self.tiles):
             for col, tile in enumerate(tiles):
                 if tile.text == "empty":
                     if tile.right():
-                        possible_moves.append("right")
+                        possible_moves.append("r")
                     if tile.left():
-                        possible_moves.append("left")
+                        possible_moves.append("l")
                     if tile.up():
-                        possible_moves.append("up")
+                        possible_moves.append("u")
                     if tile.down():
-                        possible_moves.append("down")
+                        possible_moves.append("d")
                     break
             if len(possible_moves) > 0:
                 break
 
-        if self.previous_choice == "right":
-            possible_moves.remove("left") if "left" in possible_moves else possible_moves
-        elif self.previous_choice == "left":
-            possible_moves.remove("right") if "right" in possible_moves else possible_moves
-        elif self.previous_choice == "up":
-            possible_moves.remove("down") if "down" in possible_moves else possible_moves
-        elif self.previous_choice == "down":
-            possible_moves.remove("up") if "up" in possible_moves else possible_moves
+        if self.previous_choice == "r":
+            possible_moves.remove("l") if "l" in possible_moves else possible_moves
+        elif self.previous_choice == "l":
+            possible_moves.remove("r") if "r" in possible_moves else possible_moves
+        elif self.previous_choice == "u":
+            possible_moves.remove("d") if "d" in possible_moves else possible_moves
+        elif self.previous_choice == "d":
+            possible_moves.remove("u") if "u" in possible_moves else possible_moves
 
         choice = random.choice(possible_moves)
         self.previous_choice = choice
-        if choice == "right":
-            self.tiles_grid[row][col], self.tiles_grid[row][col + 1] = self.tiles_grid[row][col + 1], \
-                                                                       self.tiles_grid[row][col]
-            self.tiles_img_coords[row][col], self.tiles_img_coords[row][col + 1] = self.tiles_img_coords[row][col + 1], \
-                                                                                      self.tiles_img_coords[row][col]
-        elif choice == "left":
-            self.tiles_grid[row][col], self.tiles_grid[row][col - 1] = self.tiles_grid[row][col - 1], \
-                                                                       self.tiles_grid[row][col]
-            self.tiles_img_coords[row][col], self.tiles_img_coords[row][col - 1] = self.tiles_img_coords[row][col - 1], \
-                                                                                        self.tiles_img_coords[row][col] 
-        elif choice == "up":
-            self.tiles_grid[row][col], self.tiles_grid[row - 1][col] = self.tiles_grid[row - 1][col], \
-                                                                       self.tiles_grid[row][col]
-            self.tiles_img_coords[row][col], self.tiles_img_coords[row - 1][col] = self.tiles_img_coords[row - 1][col], \
-                                                                                      self.tiles_img_coords[row][col]
-        elif choice == "down":
-            self.tiles_grid[row][col], self.tiles_grid[row + 1][col] = self.tiles_grid[row + 1][col], \
-                                                                       self.tiles_grid[row][col]
-            self.tiles_img_coords[row][col], self.tiles_img_coords[row + 1][col] = self.tiles_img_coords[row + 1][col], \
-                                                                                      self.tiles_img_coords[row][col]
+        self.move(row, col, choice)
+
+    def moveSolve(self, move):
+        for i in range(4):
+            for j in range(4):
+                if self.tiles_grid[i][j] == 0:
+                    row = i
+                    col = j
+                    break
+        self.move(row, col, move)
+        self.draw_tiles()
 
     def repeet(self, state, list):
         for i in list:
@@ -91,44 +96,28 @@ class Game:
         return False
 
     def solve(self):
-        success = False
-        deadend = 0
-        totalNodes = 0
-        listInt = []
+        success = False; deadend = 0; totalNodes = 0; listInt = []
         for i in range(4):
             for j in range(4):
                 listInt.append(self.tiles_grid[i][j])
-        startState = State(listInt)
-        goalState = State([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0])
-        queue = deque()
-        first = []
-        path = None
+        
+        startState = State(listInt); goalState = State([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0])
+        queue = deque(); first = []; path = None
 
-        first.append(startState)
-        queue.append(first)
+        first.append(startState); queue.append(first)
 
-        deepCon = False
-        dr = 0
-        m = 0
+        deepCon = False; dr = 0; m = 0
 
         while queue and not success and not deepCon:
-            m += 1
-            validStates = 0
-
-            l = list(queue)[0]
-            last = l[len(l) - 1]
-            next = last.nextStates()
-            totalNodes += len(next)
-
+            m += 1; validStates = 0; l = list(queue)[0]; last = l[len(l) - 1]
+            next = last.nextStates(); totalNodes += len(next)
             queue.popleft()
 
             for ns in next:
                 if not self.repeet(ns, l):
-                    validStates += 1
-                    nl = list(l)
+                    validStates += 1; nl = list(l)
                     if ns.goalFunction(goalState):
-                        success = True
-                        path = nl
+                        success = True; path = nl
                     nl.append(ns)
 
                     if len(nl) - 1> dr:
@@ -150,15 +139,8 @@ class Game:
                 print("Breadth First Search")
             print("Succes!, Path: ", len(path), " nodes: ", totalNodes, " dead ends: ", deadend, " max depth: ", dr)
 
-            self.thePath = ""
-            self.total_nodes = totalNodes
-            self.deadEnds = deadend
-            self.loops = m
-            self.dr = dr
-
-            n = 0
-            i = startState.getI()
-            j = startState.getJ()
+            self.thePath = ""; self.total_nodes = totalNodes; self.deadEnds = deadend; self.loops = m; self.dr = dr
+            n = 0; i = startState.getI(); j = startState.getJ()
             for st in path:
                 st.show()
                 if n > 0:
@@ -230,11 +212,8 @@ class Game:
     def update(self):
         if self.thePath == "":
             if self.start_game:
-                if self.start_game:
-                    if self.tiles_grid == self.tiles_grid_completed:
-                        self.start_game = False
-                        
-
+                if self.tiles_grid == self.tiles_grid_completed:
+                    self.start_game = False
                 if self.start_timer:
                     self.timer = time.time()
                     self.start_timer = False
@@ -261,25 +240,7 @@ class Game:
         else:
             move = self.thePath[0]
             self.thePath = self.thePath[1:]
-            for i in range(4):
-                for j in range(4):
-                    if self.tiles_grid[i][j] == 0:
-                        row = i
-                        col = j
-                        break
-            if move == "u":
-                self.tiles_grid[row][col], self.tiles_grid[row - 1][col] = self.tiles_grid[row - 1][col], self.tiles_grid[row][col]
-                self.tiles_img_coords[row][col], self.tiles_img_coords[row - 1][col] = self.tiles_img_coords[row - 1][col], self.tiles_img_coords[row][col]
-            elif move == "d":
-                self.tiles_grid[row][col], self.tiles_grid[row + 1][col] = self.tiles_grid[row + 1][col], self.tiles_grid[row][col]
-                self.tiles_img_coords[row][col], self.tiles_img_coords[row + 1][col] = self.tiles_img_coords[row + 1][col], self.tiles_img_coords[row][col]
-            elif move == "l":
-                self.tiles_grid[row][col], self.tiles_grid[row][col - 1] = self.tiles_grid[row][col - 1], self.tiles_grid[row][col]
-                self.tiles_img_coords[row][col], self.tiles_img_coords[row][col - 1] = self.tiles_img_coords[row][col - 1], self.tiles_img_coords[row][col]
-            elif move == "r":
-                self.tiles_grid[row][col], self.tiles_grid[row][col + 1] = self.tiles_grid[row][col + 1], self.tiles_grid[row][col]
-                self.tiles_img_coords[row][col], self.tiles_img_coords[row][col + 1] = self.tiles_img_coords[row][col + 1], self.tiles_img_coords[row][col]
-            self.draw_tiles()
+            self.moveSolve(move)
         self.all_sprites.update()
 
     def draw_grid(self):
@@ -327,7 +288,6 @@ class Game:
             UIElement(550, 350, f"Dead ends: {self.deadEnds}").draw(self.screen)
             UIElement(550, 400, f"Loops: {self.loops}").draw(self.screen)
             UIElement(550, 555, f"Time: {round(self.elapsed_time,4)} seg").draw(self.screen)
-        # UIElement(430, 300, "High Score - %.3f" % (self.high_score if self.high_score > 0 else 0)).draw(self.screen)
         pygame.display.flip()
 
     def events(self):
@@ -343,23 +303,19 @@ class Game:
                         if self.thePath == "":
                             if tile.click(mouse_x, mouse_y):
                                 if tile.right() and self.tiles_grid[row][col + 1] == 0:
-                                    self.tiles_grid[row][col], self.tiles_grid[row][col + 1] = self.tiles_grid[row][col + 1], self.tiles_grid[row][col]
-                                    self.tiles_img_coords[row][col], self.tiles_img_coords[row][col + 1] = self.tiles_img_coords[row][col + 1], self.tiles_img_coords[row][col]
+                                    self.move(row, col, "r")
                                     if self.start_game:
                                         self.total_moves += 1
                                 if tile.left() and self.tiles_grid[row][col - 1] == 0:
-                                    self.tiles_grid[row][col], self.tiles_grid[row][col - 1] = self.tiles_grid[row][col - 1], self.tiles_grid[row][col]
-                                    self.tiles_img_coords[row][col], self.tiles_img_coords[row][col - 1] = self.tiles_img_coords[row][col - 1], self.tiles_img_coords[row][col]
+                                    self.move(row, col, "l")
                                     if self.start_game:
                                         self.total_moves += 1
                                 if tile.up() and self.tiles_grid[row - 1][col] == 0:
-                                    self.tiles_grid[row][col], self.tiles_grid[row - 1][col] = self.tiles_grid[row - 1][col], self.tiles_grid[row][col]
-                                    self.tiles_img_coords[row][col], self.tiles_img_coords[row - 1][col] = self.tiles_img_coords[row - 1][col], self.tiles_img_coords[row][col]
+                                    self.move(row, col, "u")
                                     if self.start_game:
                                         self.total_moves += 1
                                 if tile.down() and self.tiles_grid[row + 1][col] == 0:
-                                    self.tiles_grid[row][col], self.tiles_grid[row + 1][col] = self.tiles_grid[row + 1][col], self.tiles_grid[row][col]
-                                    self.tiles_img_coords[row][col], self.tiles_img_coords[row + 1][col] = self.tiles_img_coords[row + 1][col], self.tiles_img_coords[row][col]
+                                    self.move(row, col, "d")
                                     if self.start_game:
                                         self.total_moves += 1
                                 self.draw_tiles()
@@ -402,12 +358,16 @@ class Game:
                             self.showShuffle = False
                             self.showSolve = False
                             self.showTestCases = False
+                            
+                            #if want to use DFS or BFS without defined test case
+                            #just comment the three lines below
+                            #consider that doing this, the program could crash
                             self.tiles_grid = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[0,13,14,15]]
                             self.tiles_img_coords = [[(0,0),(0,1),(0,2),(0,3)],[(1,0),(1,1),(1,2),(1,3)],[(2,0),(2,1),(2,2),(2,3)],[(3,3),(3,0),(3,1),(3,2)]]
                             self.draw_tiles()
 
 
 game = Game()
-while True:
+if __name__ == "__main__":
     game.new()
     game.run()

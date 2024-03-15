@@ -26,28 +26,6 @@ class State():
                         self.posI = i
                         self.posJ = j
 
-    # def state(self, state):
-    #     n = 0
-    #     self.board = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-    #     for i in range(4):
-    #         for j in range(4):
-    #             value = int(state[n])
-    #             self.board[i][j] = value
-    #             if self.board[i][j] == 0:
-    #                 self.posI = i
-    #                 self.posJ = j
-    #             n += 1
-        
-    # def state(self, board, movement):
-    #     self.movement = movement
-    #     self.board = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-    #     for i in range(4):
-    #         for j in range(4):
-    #             self.board[i][j] = board[i][j]
-    #             if self.board[i][j] == 0:
-    #                 self.posI = i
-    #                 self.posJ = j
-
     def show(self):
         if self.movement != None:
             print(self.movement)
