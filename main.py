@@ -362,9 +362,9 @@ class Game:
                             #if want to use DFS or BFS without defined test case
                             #just comment the three lines below
                             #consider that doing this, the program could crash
-                            self.tiles_grid = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[0,13,14,15]]
-                            self.tiles_img_coords = [[(0,0),(0,1),(0,2),(0,3)],[(1,0),(1,1),(1,2),(1,3)],[(2,0),(2,1),(2,2),(2,3)],[(3,3),(3,0),(3,1),(3,2)]]
-                            self.draw_tiles()
+                            # self.tiles_grid = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[0,13,14,15]]
+                            # self.tiles_img_coords = [[(0,0),(0,1),(0,2),(0,3)],[(1,0),(1,1),(1,2),(1,3)],[(2,0),(2,1),(2,2),(2,3)],[(3,3),(3,0),(3,1),(3,2)]]
+                            # self.draw_tiles()
 
 
 game = Game()
